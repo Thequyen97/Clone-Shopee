@@ -33,7 +33,7 @@ export default function Login() {
     loginMutation.mutate(data, {
       onSuccess: (data) => {
         setIsAuthenticated(true)
-        setProfile(data.data.data.user)
+        setProfile(data!.data!.data!.user)
         navigate('/')
       },
       onError: (error) => {
@@ -77,11 +77,12 @@ export default function Login() {
               />
               <div className='mt-3'>
                 <Button
-                  className='w-full py-4 px-2 uppercase bg-red-500 text-white text-sm hover:bg-red-600 flex justify-center items-center'
-                  isLoading={loginMutation.isLoading}
-                  disabled={loginMutation.isLoading}
+                  type='submit'
+                  className='flex  w-full items-center justify-center bg-red-500 py-4 px-2 text-sm uppercase text-white hover:bg-red-600'
+                  isLoading={loginMutation?.isLoading}
+                  disabled={loginMutation?.isLoading}
                 >
-                  ĐĂNG NHẬP
+                  Đăng nhập
                 </Button>
               </div>
               <div className='flex items-center justify-center mt-8'>

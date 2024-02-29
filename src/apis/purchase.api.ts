@@ -1,5 +1,4 @@
-// eslint-disable-next-line import/no-unresolved
-import { Purchase, PurchaseListStatus } from 'src/types/Purchase.type'
+import { Purchase, PurchaseListStatus } from 'src/types/purchase.type'
 import { SuccessResponse } from 'src/types/utils.type'
 import http from 'src/utils/http'
 

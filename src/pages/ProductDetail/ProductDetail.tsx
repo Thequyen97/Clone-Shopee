@@ -8,7 +8,10 @@ import { Product as ProductType, ProductListConfig } from 'src/types/product.typ
 import { formatCurrency, formatNumberToSocialStyle, getIdFromNameId, rateSale } from 'src/utils/utils'
 import Product from '../ProductList/components/Product/Product'
 import QuantityController from 'src/components/QuantityController'
-import purchaseApi from 'src/apis/Purchase.api'
+import purchaseApi from 'src/apis/purchase.api'
+import { queryClient } from 'src/main'
+import { purchasesStatus } from 'src/constants/purchase'
+import { toast } from 'react-toastify'
 
 export default function ProductDetail() {
   const [buyCount, setBuyCount] = useState(1)
@@ -26,8 +29,8 @@ export default function ProductDetail() {
     () => (product ? product.images.slice(...currentIndexImages) : []),
     [product, currentIndexImages]
   )
-
   const queryConfig: ProductListConfig = { limit: '20', page: '1', category: product?.category._id }
+
   const { data: productsData } = useQuery({
     queryKey: ['product', queryConfig],
     queryFn: () => {
@@ -39,6 +42,7 @@ export default function ProductDetail() {
 
   const addToCartMutation = useMutation(purchaseApi.addToCart)
 
+  // zoom để dịch chuyển ảnh
   useEffect(() => {
     if (product && product.images.length) {
       setActiveImage(product.images[0])
@@ -84,7 +88,15 @@ export default function ProductDetail() {
   }
 
   const addToCart = () => {
-    addToCartMutation.mutate({ buy_count: buyCount, product_id: product?._id as string })
+    addToCartMutation.mutate(
+      { buy_count: buyCount, product_id: product?._id as string },
+      {
+        onSuccess: (data) => {
+          toast.success(data.data.message, { autoClose: 3000 })
+          queryClient.invalidateQueries({ queryKey: ['purchases', { status: purchasesStatus.inCart }] })
+        }
+      }
+    )
   }
 
   if (!product) return null
@@ -188,7 +200,10 @@ export default function ProductDetail() {
                 <div className='ml-6 text-sm text-gray-500'>{product.quantity} sản phẩm có sãn</div>
               </div>
               <div className='mt-8 flex items-center'>
-                <button className='flex h-12 items-center justify-center rounded-sm border border-orange bg-orange/10 px-5 capitalize text-orange shadow-sm hover:bg-orange/5'>
+                <button
+                  onClick={addToCart}
+                  className='flex h-12 items-center justify-center rounded-sm border border-orange bg-orange/10 px-5 capitalize text-orange shadow-sm hover:bg-orange/5'
+                >
                   <svg
                     enableBackground='new 0 0 15 15'
                     viewBox='0 0 15 15'
